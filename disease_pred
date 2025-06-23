@@ -1,0 +1,71 @@
+# Import necessary libraries
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+from xgboost import XGBClassifier
+from sklearn.metrics import classification_report, accuracy_score
+
+# Step 1: Load the dataset
+df = pd.read_csv("/content/diabetes.csv")  # Make sure this file is in your working directory
+
+# Step 2: Split features and labels
+X = df.drop("Outcome", axis=1)
+y = df["Outcome"]
+
+# Step 3: Split into train and test
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Step 4: Scale the features
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# Step 5: Train Models
+# Logistic Regression
+logreg_model = LogisticRegression()
+logreg_model.fit(X_train, y_train)
+
+# Random Forest
+rf_model = RandomForestClassifier()
+rf_model.fit(X_train, y_train)
+
+# SVM
+svm_model = SVC()
+svm_model.fit(X_train, y_train)
+
+# XGBoost
+xgb_model = XGBClassifier(use_label_encoder=False, eval_metric='logloss')
+xgb_model.fit(X_train, y_train)
+
+# Step 6: Evaluation
+models = {
+    "Logistic Regression": logreg_model,
+    "Random Forest": rf_model,
+    "SVM": svm_model,
+    "XGBoost": xgb_model
+}
+
+for name, model in models.items():
+    print(f"\n--- {name} ---")
+    y_pred = model.predict(X_test)
+    print("Accuracy:", accuracy_score(y_test, y_pred))
+    print(classification_report(y_test, y_pred))
+
+# Step 7: Make prediction on new data
+# Input Format: [Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age]
+new_data = np.array([[3, 120, 70, 25, 80, 28.5, 0.5, 33]])  # Example input
+new_data_scaled = scaler.transform(new_data)
+
+# Use the best model (SVM in your case)
+prediction = svm_model.predict(new_data_scaled)
+
+# Step 8: Output result
+print("\n--- Prediction on New Data ---")
+if prediction[0] == 1:
+    print("⚠️ Person is likely to have diabetes.")
+else:
+    print("✅ Person is unlikely to have diabetes.")
