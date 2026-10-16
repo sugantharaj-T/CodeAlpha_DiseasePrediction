@@ -66,6 +66,6 @@ prediction = svm_model.predict(new_data_scaled)
 # Step 8: Output result
 print("\n--- Prediction on New Data ---")
 if prediction[0] == 1:
-    print("⚠️ Person is likely to have diabetes.")
+    print("Person is likely to have diabetes.")
 else:
-    print("✅ Person is unlikely to have diabetes.")
+    print("Person is unlikely to have diabetes.")
